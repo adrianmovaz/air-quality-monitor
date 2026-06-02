@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Air Quality Monitor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="scanline"></div>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-mark"></span>
+      <div>
+        <h1>AIR QUALITY MONITOR</h1>
+        <p class="brand-sub">ESP32 · MQ-2 · NODE / PRISMA / SQLITE</p>
+      </div>
+    </div>
+    <div class="status-block">
+      <div class="status-pill" id="connectionPill">
+        <span class="dot"></span><span id="connectionText">CONNECTING</span>
+      </div>
+      <span class="clock" id="lastUpdate">--:--:--</span>
+    </div>
+  </header>
+
+  <section class="cards" id="liveCards"></section>
+
+  <section class="controls">
+    <div class="range-group" id="rangeGroup">
+      <button data-hours="1">1H</button>
+      <button data-hours="6">6H</button>
+      <button data-hours="24" class="active">24H</button>
+      <button data-hours="168">7D</button>
+      <button data-hours="336">14D</button>
+    </div>
+  </section>
+
+  <section class="charts">
+    <div class="panel">
+      <div class="panel-head"><h2>PPM</h2><span class="unit">parts per million</span></div>
+      <canvas id="ppmChart"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>SENSOR VOLTAGE</h2><span class="unit">volts</span></div>
+      <canvas id="voltageChart"></canvas>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>RESISTANCE RATIO</h2><span class="unit">Rs / Ro</span></div>
+      <canvas id="ratioChart"></canvas>
+    </div>
+  </section>
+
+  <section class="panel events-panel">
+    <div class="panel-head"><h2>DETECTION EVENTS</h2><span class="unit" id="eventCount"></span></div>
+    <div class="table-wrap">
+      <table id="eventsTable">
+        <thead>
+          <tr><th>TIMESTAMP</th><th>SENSOR</th><th>PPM</th><th>Rs/Ro</th><th>VOLTAGE</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <script src="app.js"></script>
+</body>
+</html>
