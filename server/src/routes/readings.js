@@ -3,6 +3,35 @@ import { prisma } from "../db/prisma.js";
 
 export const readingsRouter = Router();
 
+// NUEVA RUTA: Para recibir datos del ESP32
+readingsRouter.post("/", async (req, res) => {
+  try {
+    const payload = req.body;
+    
+    const timestamp = payload.epoch && payload.epoch > 1000000000 
+      ? new Date(payload.epoch * 1000) 
+      : new Date();
+
+    const records = payload.sensors.map((sensor) => ({
+      sensorId: sensor.sensorId,
+      rawValue: sensor.rawValue,
+      adcVoltage: sensor.adcVoltage,
+      sensorVoltage: sensor.sensorVoltage,
+      resistance: sensor.resistance,
+      resistanceRatio: sensor.resistanceRatio,
+      ppm: sensor.ppm,
+      gasDetected: sensor.gasDetected,
+      sensorTimestamp: timestamp
+    }));
+
+    await prisma.reading.createMany({ data: records });
+    res.status(201).json({ message: "Lectura guardada en AWS" });
+  } catch (error) {
+    console.error(`Error guardando lectura: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 readingsRouter.get("/latest", async (req, res) => {
   try {
     const sensorIds = [1];
