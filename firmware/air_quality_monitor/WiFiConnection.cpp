@@ -6,7 +6,12 @@
 void WiFiConnection::connect() {
   WiFi.mode(WIFI_STA);
   WiFi.setHostname(DEVICE_HOSTNAME);
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  if (strlen(WIFI_PASSWORD) == 0) {
+    WiFi.begin(WIFI_SSID);
+  } else {
+    WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  }
 
   unsigned long startAttempt = millis();
   while (WiFi.status() != WL_CONNECTED && millis() - startAttempt < 20000) {
@@ -18,6 +23,7 @@ void WiFiConnection::connect() {
     Serial.println();
     Serial.print("WiFi connected, IP: ");
     Serial.println(WiFi.localIP());
+    WiFi.setSleep(WIFI_PS_MIN_MODEM);
     if (MDNS.begin(DEVICE_HOSTNAME)) {
       MDNS.addService("http", "tcp", HTTP_SERVER_PORT);
       Serial.print("mDNS active: http://");
