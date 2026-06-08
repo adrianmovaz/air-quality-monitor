@@ -9,7 +9,7 @@ const server = app.listen(config.serverPort, () => {
   console.log(`Server listening on http://localhost:${config.serverPort}`);
 });
 
-const pollerHandle = startDevicePoller();
+//const pollerHandle = startDevicePoller();
 const cleanerHandle = startRetentionCleaner();
 
 const shutdown = async () => {
