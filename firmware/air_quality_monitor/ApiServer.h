@@ -11,6 +11,7 @@ public:
   ApiServer(SensorReading *sensor, TimeService *timeService);
   void begin();
   void handleClient();
+  String buildReadingsJson();
 
 private:
   WebServer _server;
@@ -20,7 +21,6 @@ private:
   void handleRoot();
   void handleReadings();
   String buildSensorJson(SensorReading *reading);
-  String buildReadingsJson();
   String buildLivePage();
 };
 

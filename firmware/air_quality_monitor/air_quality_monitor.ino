@@ -3,6 +3,8 @@
 #include "TimeService.h"
 #include "MQ2Sensor.h"
 #include "ApiServer.h"
+#include <HTTPClient.h>
+#include <esp_sleep.h>
 
 WiFiConnection wifiConnection;
 TimeService timeService;
@@ -47,6 +49,22 @@ void loop() {
   if (now - lastReadingTime >= READING_INTERVAL_MS) {
     lastReadingTime = now;
     sensorReading = sensor.read();
+
+    if (wifiConnection.isConnected()) {
+      HTTPClient http;
+      String serverUrl = "http://10.100.76.145:4000/api/readings";
+      http.begin(serverUrl);
+      http.addHeader("Content-Type", "application/json");
+      int httpResponseCode = http.POST(apiServer.buildReadingsJson());
+      if (httpResponseCode > 0) {
+        Serial.print("POST Code: ");
+        Serial.println(httpResponseCode);
+      } else {
+        Serial.print("Push error: ");
+        Serial.println(http.errorToString(httpResponseCode).c_str());
+      }
+      http.end();
+    }
   }
 
   if (now - lastTimeSync >= NTP_SYNC_INTERVAL_MS) {
@@ -54,5 +72,13 @@ void loop() {
     if (wifiConnection.isConnected()) {
       timeService.sync();
     }
+  }
+
+  unsigned long elapsed = millis() - lastReadingTime;
+  if (elapsed < READING_INTERVAL_MS) {
+    unsigned long remaining = READING_INTERVAL_MS - elapsed;
+    unsigned long sleepMs = remaining > 500 ? 500 : remaining;
+    esp_sleep_enable_timer_wakeup((uint64_t)sleepMs * 1000ULL);
+    esp_light_sleep_start();
   }
 }
